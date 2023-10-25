@@ -3,13 +3,13 @@ import 'flatpickr/dist/flatpickr.min.css';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 // import Notiflix from 'notiflix';
 
-const startBtn = document.querySelector('button[data-start]');
+const startButton = document.querySelector('button[data-start]');
 const timerDays = document.querySelector('.value[data-days]');
 const timerHours = document.querySelector('.value[data-hours]');
 const timerMinutes = document.querySelector('.value[data-minutes]');
 const timerSeconds = document.querySelector('.value[data-seconds]');
 
-startBtn.disabled = true;
+startButton.disabled = true;
 let targetTime = null;
 
 const options = {
@@ -18,12 +18,11 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    //   console.log(selectedDates[0]);
     if (selectedDates[0] <= new Date()) {
-      startBtn.disabled = true;
+      startButton.disabled = true;
       Notify.failure('Please choose a date in the future');
     } else {
-      startBtn.disabled = false;
+      startButton.disabled = false;
       targetTime = selectedDates[0];
     }
   },
@@ -31,25 +30,24 @@ const options = {
 
 flatpickr('#datetime-picker', options);
 
-startBtn.addEventListener('click', onStartBtnClick);
+startButton.addEventListener('click', onStartBtnClick);
 
 function onStartBtnClick() {
-  startBtn.disabled = true;
+  startButton.disabled = true;
   const intervalId = setInterval(() => {
     const currentTime = new Date();
     const deltaTime = targetTime - currentTime;
-    // console.log(deltaTime);
+
     if (deltaTime <= 0) {
       clearInterval(intervalId);
       return;
     }
-    const { days, hours, minutes, seconds } = convertMs(deltaTime);
-    // console.log(`${days}: ${hours}: ${minutes}: ${seconds}`);
+    const { days, hours, minutes, seconds } = convertToMsec(deltaTime);
 
-    const formatTimeDays = addLeadingZero(days);
-    const formatTimeHours = addLeadingZero(hours);
-    const formatTimeMinutes = addLeadingZero(minutes);
-    const formatTimeSeconds = addLeadingZero(seconds);
+    const formatTimeDays = addZero(days);
+    const formatTimeHours = addZero(hours);
+    const formatTimeMinutes = addZero(minutes);
+    const formatTimeSeconds = addZero(seconds);
 
     timerDays.textContent = formatTimeDays;
     timerHours.textContent = formatTimeHours;
@@ -58,8 +56,7 @@ function onStartBtnClick() {
   }, 1000);
 }
 
-function convertMs(ms) {
-  // Number of milliseconds per unit of time
+function convertToMsec(ms) {
   const second = 1000;
   const minute = second * 60;
   const hour = minute * 60;
@@ -77,6 +74,6 @@ function convertMs(ms) {
   return { days, hours, minutes, seconds };
 }
 
-function addLeadingZero(value) {
+function addZero(value) {
   return value.toString().padStart(2, '0');
 }
